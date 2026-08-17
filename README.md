@@ -19,7 +19,7 @@ Edit `appsettings.json` to configure which file extensions are removed after fla
 
 ```json
 {
-  "FileExtensionsToBeRemoved": ".txt,.nfo,.jpg,.png,.bmp,.md,.doc,.docx,.jpeg,.gif,.exe"
+  "FileExtensionsToBeRemoved": "txt,nfo,jpg,png,bmp,md,doc,docx,jpeg,gif,exe,srt"
 }
 ```
 
