@@ -20,7 +20,7 @@ static void CleanUp(DirectoryInfo root, IConfiguration config)
         ?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
         ?? [];
 
-    foreach (var file in GetFiles(root).Where(f => extensions.Contains(f.Extension, StringComparer.OrdinalIgnoreCase)))
+    foreach (var file in GetFiles(root).Where(f => extensions.Contains(f.Extension.TrimStart('.'), StringComparer.OrdinalIgnoreCase)))
     {
         Console.ForegroundColor = ConsoleColor.DarkYellow;
         Console.WriteLine($"removing: {file.FullName}");
