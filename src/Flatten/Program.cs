@@ -23,7 +23,7 @@ static void CleanUp(DirectoryInfo root, IConfiguration config)
     foreach (var file in GetFiles(root).Where(f => extensions.Contains(f.Extension, StringComparer.OrdinalIgnoreCase)))
     {
         Console.ForegroundColor = ConsoleColor.DarkYellow;
-        Console.WriteLine(file.FullName);
+        Console.WriteLine($"removing: {file.FullName}");
         Console.ResetColor();
 
         try
@@ -43,17 +43,14 @@ static void FlattenFiles(DirectoryInfo root, DirectoryInfo destination)
     {
         foreach (var file in GetFiles(root))
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(file.FullName);
-            Console.ResetColor();
+            var target = GetUniqueTarget(destination.FullName, file.Name);
 
-            var target = Path.Combine(destination.FullName, file.Name);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"{file.FullName} -> {target}");
+            Console.ResetColor();
 
             try
             {
-                if (File.Exists(target))
-                    File.Delete(target);
-
                 File.Move(file.FullName, target);
             }
             catch (Exception ex)
@@ -69,7 +66,7 @@ static void FlattenFiles(DirectoryInfo root, DirectoryInfo destination)
     if (root.FullName != destination.FullName)
     {
         Console.ForegroundColor = ConsoleColor.DarkYellow;
-        Console.WriteLine(root.FullName);
+        Console.WriteLine($"removing dir: {root.FullName}");
         Console.ResetColor();
 
         try
@@ -81,6 +78,25 @@ static void FlattenFiles(DirectoryInfo root, DirectoryInfo destination)
             WriteError(ex.Message);
         }
     }
+}
+
+static string GetUniqueTarget(string directory, string fileName)
+{
+    var target = Path.Combine(directory, fileName);
+    if (!File.Exists(target))
+        return target;
+
+    var name = Path.GetFileNameWithoutExtension(fileName);
+    var ext = Path.GetExtension(fileName);
+    var counter = 1;
+
+    do
+    {
+        target = Path.Combine(directory, $"{name} ({counter++}){ext}");
+    }
+    while (File.Exists(target));
+
+    return target;
 }
 
 static IEnumerable<FileInfo> GetFiles(DirectoryInfo root, string filter = "*.*")
@@ -104,6 +120,6 @@ static IEnumerable<FileInfo> GetFiles(DirectoryInfo root, string filter = "*.*")
 static void WriteError(string message)
 {
     Console.ForegroundColor = ConsoleColor.DarkRed;
-    Console.WriteLine(message);
+    Console.Error.WriteLine(message);
     Console.ResetColor();
 }
